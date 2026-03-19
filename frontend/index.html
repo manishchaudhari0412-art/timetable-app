@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📅 Timetable Generator — MEAN Stack</title>
+<meta name="description" content="Smart Timetable Generator for Schools and Colleges. Built with MEAN Stack.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- SIDEBAR NAV -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⏱</div>
+    <span class="logo-text">TimaTable<span class="logo-accent">Pro</span></span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#" class="nav-item active" onclick="showPage('generator')" id="nav-generator">
+      <span class="nav-icon">⚡</span><span>Generator</span>
+    </a></li>
+    <li><a href="#" class="nav-item" onclick="showPage('saved')" id="nav-saved">
+      <span class="nav-icon">💾</span><span>Saved</span>
+    </a></li>
+    <li><a href="#" class="nav-item" onclick="showPage('about')" id="nav-about">
+      <span class="nav-icon">ℹ</span><span>About</span>
+    </a></li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="api-status" id="apiStatus">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Checking...</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HAMBURGER -->
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+
+<!-- MAIN CONTENT -->
+<main class="main-content" id="mainContent">
+
+  <!-- ═══ PAGE: GENERATOR ═══ -->
+  <div id="page-generator" class="page active">
+
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+      <div class="hero-text">
+        <h1>📅 Smart Timetable Generator</h1>
+        <p>Create beautiful, conflict-free timetables for your institution in seconds.</p>
+      </div>
+      <div class="hero-steps">
+        <div class="step-dot active" id="dot1">1</div>
+        <div class="step-line"></div>
+        <div class="step-dot" id="dot2">2</div>
+        <div class="step-line"></div>
+        <div class="step-dot" id="dot3">3</div>
+        <div class="step-line"></div>
+        <div class="step-dot" id="dot4">4</div>
+      </div>
+    </div>
+
+    <!-- STEP TABS -->
+    <div class="step-tabs">
+      <button class="stab active" id="stab1" onclick="gotoStep(1)">🏫 Institution</button>
+      <button class="stab" id="stab2" onclick="gotoStep(2)">📚 Subjects</button>
+      <button class="stab" id="stab3" onclick="gotoStep(3)">👩‍🏫 Teachers</button>
+      <button class="stab" id="stab4" onclick="gotoStep(4)">⏰ Slots & Breaks</button>
+    </div>
+
+    <!-- ─── STEP 1: Institution ─── -->
+    <div class="glass-card step-panel active" id="step1">
+      <div class="card-header">
+        <div class="card-icon">🏫</div>
+        <div>
+          <h2>Institution Details</h2>
+          <p class="card-sub">Basic information about your school or college.</p>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Institution Type</label>
+          <select id="instType" onchange="updateLabel()">
+            <option value="School">School</option>
+            <option value="College">College</option>
+          </select>
+        </div>
+        <div class="field">
+          <label id="instNameLabel">School/College Name</label>
+          <input type="text" id="schoolName" placeholder="e.g. St. Mary's School">
+        </div>
+        <div class="field">
+          <label>Academic Year</label>
+          <input type="text" id="acadYear" value="2025-26">
+        </div>
+        <div class="field">
+          <label>Working Days/Week</label>
+          <select id="workDays">
+            <option value="5">5 days (Mon–Fri)</option>
+            <option value="6" selected>6 days (Mon–Sat)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Number of Classes</label>
+          <input type="number" id="numClasses" value="3" min="1" max="12">
+        </div>
+        <div class="field">
+          <label>Divisions per Class</label>
+          <input type="number" id="numDivs" value="2" min="1" max="8">
+        </div>
+        <div class="field">
+          <label>Students per Division</label>
+          <input type="number" id="numStudents" value="40" min="10" max="80">
+        </div>
+        <div class="field">
+          <label>Starting Classroom No.</label>
+          <input type="number" id="startRoom" value="101" min="1" max="999">
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-primary" onclick="gotoStep(2)">Next: Subjects →</button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 2: Subjects ─── -->
+    <div class="glass-card step-panel" id="step2">
+      <div class="card-header">
+        <div class="card-icon">📚</div>
+        <div>
+          <h2>Subjects</h2>
+          <p class="card-sub">Set how many periods per week each subject needs.</p>
+        </div>
+      </div>
+      <div class="list-labels">
+        <span class="ll-name">Subject Name</span>
+        <span class="ll-pw">Periods/Week</span>
+      </div>
+      <div id="subjectList"></div>
+      <button class="btn-add" onclick="addSubject()">+ Add Subject</button>
+      <div class="card-footer">
+        <button class="btn btn-ghost" onclick="gotoStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="gotoStep(3)">Next: Teachers →</button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 3: Teachers ─── -->
+    <div class="glass-card step-panel" id="step3">
+      <div class="card-header">
+        <div class="card-icon">👩‍🏫</div>
+        <div>
+          <h2>Teachers</h2>
+          <p class="card-sub">Assign one teacher per subject.</p>
+        </div>
+      </div>
+      <div class="list-labels">
+        <span class="ll-name">Teacher Name</span>
+        <span class="ll-name">Subject</span>
+      </div>
+      <div id="teacherList"></div>
+      <button class="btn-add" onclick="addTeacher()">+ Add Teacher</button>
+      <div class="card-footer">
+        <button class="btn btn-ghost" onclick="gotoStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="gotoStep(4)">Next: Slots & Breaks →</button>
+      </div>
+    </div>
+
+    <!-- ─── STEP 4: Slots & Breaks ─── -->
+    <div class="glass-card step-panel" id="step4">
+      <div class="card-header">
+        <div class="card-icon">⏰</div>
+        <div>
+          <h2>Time Slots & Breaks</h2>
+          <p class="card-sub">Define periods and breaks for your school day.</p>
+        </div>
+      </div>
+      <div class="sec-title">📋 Periods</div>
+      <div id="slotList"></div>
+      <button class="btn-add" onclick="addSlot()">+ Add Period</button>
+      <div class="sec-title" style="margin-top:20px">☕ Breaks</div>
+      <div id="breakList"></div>
+      <button class="btn-add btn-add-brk" onclick="addBreak()">+ Add Break</button>
+      <div class="card-footer">
+        <button class="btn btn-ghost" onclick="gotoStep(3)">← Back</button>
+        <button class="btn btn-generate" onclick="generate()">⚡ Generate Timetable!</button>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="glass-card step-panel" id="stepLoading" style="text-align:center;padding:60px 20px">
+      <div class="big-spinner"></div>
+      <h2 style="color:var(--accent);margin:20px 0 8px">Generating...</h2>
+      <p style="color:var(--text-muted)">Building your perfect timetable 🚀</p>
+    </div>
+
+    <!-- OUTPUT -->
+    <div id="stepOutput" class="step-panel" style="display:none">
+      <div class="output-header">
+        <div>
+          <h2 id="outTitle" style="font-size:22px;font-weight:700"></h2>
+          <p id="outSub" style="color:var(--text-muted);font-size:13px;margin-top:4px"></p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="resetAll()">↺ New</button>
+          <button class="btn btn-save" id="btnSave" onclick="saveTimetable()">💾 Save</button>
+          <button class="btn btn-primary" onclick="window.print()">🖨 Print</button>
+        </div>
+      </div>
+
+      <!-- Load Panel -->
+      <div class="glass-card" style="margin-bottom:20px">
+        <h3 class="panel-title">📊 Subject Load per Week</h3>
+        <div class="load-grid" id="loadGrid"></div>
+      </div>
+
+      <!-- Division tabs -->
+      <div class="glass-card">
+        <div class="div-tabs" id="divTabs"></div>
+        <div class="room-info-box" id="roomInfo"></div>
+        <div class="tt-scroll">
+          <table id="ttTable"></table>
+        </div>
+        <p class="scroll-hint">← Scroll to see all days →</p>
+      </div>
+    </div>
+
+  </div><!-- /page-generator -->
+
+  <!-- ═══ PAGE: SAVED ═══ -->
+  <div id="page-saved" class="page">
+    <div class="hero-banner" style="background:linear-gradient(135deg,#1e3a5f,#2d6a9f)">
+      <div class="hero-text">
+        <h1>💾 Saved Timetables</h1>
+        <p>All your timetables stored in MongoDB database.</p>
+      </div>
+    </div>
+    <div id="savedList" class="saved-grid">
+      <div class="loading-saved">Loading...</div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: ABOUT ═══ -->
+  <div id="page-about" class="page">
+    <div class="hero-banner" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)">
+      <div class="hero-text">
+        <h1>ℹ About TimetablePro</h1>
+        <p>Built with the MEAN Stack — MongoDB, Express, Angular (style), Node.js</p>
+      </div>
+    </div>
+    <div class="about-grid">
+      <div class="glass-card about-card">
+        <div class="about-icon">🍃</div>
+        <h3>MongoDB</h3>
+        <p>All timetables, subjects, and teacher data are stored in MongoDB — a powerful NoSQL database that handles flexible schemas perfectly.</p>
+      </div>
+      <div class="glass-card about-card">
+        <div class="about-icon">⚡</div>
+        <h3>Express.js</h3>
+        <p>RESTful API backend built on Express.js with full CRUD routes for timetables, subjects, and teachers. Runs on Node.js.</p>
+      </div>
+      <div class="glass-card about-card">
+        <div class="about-icon">🔺</div>
+        <h3>Angular (Style)</h3>
+        <p>Component-driven single-page frontend with reactive state, dynamic forms, and real-time timetable generation logic.</p>
+      </div>
+      <div class="glass-card about-card">
+        <div class="about-icon">🐳</div>
+        <h3>Docker</h3>
+        <p>Fully containerized with Docker Compose. Three services: MongoDB, Express API, and Nginx-served frontend — one command to run all.</p>
+      </div>
+    </div>
+    <div class="glass-card" style="max-width:700px;margin:0 auto">
+      <h3 class="panel-title">🔗 API Endpoints</h3>
+      <table class="api-table">
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge-get">GET</span></td><td>/api/health</td><td>Health check</td></tr>
+          <tr><td><span class="badge-get">GET</span></td><td>/api/timetables</td><td>All timetables</td></tr>
+          <tr><td><span class="badge-post">POST</span></td><td>/api/timetables</td><td>Save timetable</td></tr>
+          <tr><td><span class="badge-get">GET</span></td><td>/api/timetables/:id</td><td>Single timetable</td></tr>
+          <tr><td><span class="badge-del">DELETE</span></td><td>/api/timetables/:id</td><td>Delete timetable</td></tr>
+          <tr><td><span class="badge-get">GET</span></td><td>/api/subjects</td><td>All subjects</td></tr>
+          <tr><td><span class="badge-get">GET</span></td><td>/api/teachers</td><td>All teachers</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
