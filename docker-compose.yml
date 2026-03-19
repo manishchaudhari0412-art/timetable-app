@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # ─── MongoDB ──────────────────────────────────────────────
+  mongo:
+    image: mongo:6
+    container_name: timetable_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - timetable-network
+
+  # ─── Node.js Backend ──────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: timetable_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/timetabledb
+    depends_on:
+      - mongo
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - timetable-network
+
+  # ─── Frontend (Nginx static server) ───────────────────────
+  frontend:
+    image: nginx:alpine
+    container_name: timetable_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    networks:
+      - timetable-network
+    depends_on:
+      - backend
+
+# ─── Volumes ────────────────────────────────────────────────
+volumes:
+  mongo-data:
+    driver: local
+
+# ─── Networks ───────────────────────────────────────────────
+networks:
+  timetable-network:
+    driver: bridge
